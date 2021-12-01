@@ -22,7 +22,7 @@ void disableRawMode(){
 }
 //Turn off echoing, meaning you enable raw mode
 void enableRawMode(){
-    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr"));
+    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
     atexit(disableRawMode);
 
     struct termios raw = orig_termios;
@@ -44,7 +44,7 @@ void enableRawMode(){
 int main() {
     enableRawMode();
     while(1){
-        char c '\0'
+        char c = '\0';
         if(read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
         //iscntrl() checks if a character is a control character
         if (iscntrl(c)) {
