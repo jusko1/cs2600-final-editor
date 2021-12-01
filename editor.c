@@ -19,7 +19,7 @@ void enableRawMode(){
     //ICANON flag turns off canonical mode
     raw.c_lflag &= ~(ECHO | ICANON);
 
-    tcsetattri(STDIN_FILENO, TCSAFLUSH, $raw);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 int main() {
     enableRawMode();
