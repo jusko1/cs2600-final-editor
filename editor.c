@@ -1,5 +1,6 @@
 //MIGHT HAVE TO DELETE SOME STUFF IN THE MAIN METHOD, THE "CORRECT" MAIN METHOD IS 
 // IN THE SECOND SECTION OF THE TEXT EDITOR CODE, NEAR THE TOP "Clear the screen"
+//START HERE: Part2: "Hide the cursor when repainting"
 /*** INCLUDES ***/
 #include <ctype.h>
 #include <errno.h>
