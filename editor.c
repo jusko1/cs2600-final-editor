@@ -241,7 +241,7 @@ void editorMoveCursor(char key){
             }
             break;
         case ARROW_RIGHT:
-            if(E.cs != E.screencols -1){
+            if(E.cx != E.screencols - 1){
                 E.cx++;
             }
             break;
@@ -268,6 +268,7 @@ void editorProcessKeypress() {
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
             break;
+        
         case HOME_KEY:
             E.cx = 0;
             break;
@@ -299,7 +300,7 @@ void editorProcessKeypress() {
 void initEditor(){
     E.cx = 0;
     E.cy = 0;
-    if(getWindowsSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+    if(getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
 int main() {
     enableRawMode();
