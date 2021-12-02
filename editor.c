@@ -258,7 +258,7 @@ void editorMoveCursor(int key){
     }
 }
 void editorProcessKeypress() {
-    char c = editorReadKey();
+    int c = editorReadKey();
 
     switch (c) {
         //COMMAND: ctrl-q to quit
