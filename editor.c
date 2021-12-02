@@ -308,6 +308,10 @@ int main() {
     while(1){
         editorRefreshScreen();
         editorProcessKeypress();
+    }
+
+    /*while(1){
+       
         char c = '\0';
         if(read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
         //iscntrl() checks if a character is a control character
@@ -320,6 +324,7 @@ int main() {
         if(c == CTRL_KEY('q'))
             break;
     }
+    */
     //reads 1 byte from standard input into char c, as long it is not 'q'
     return 0;
 }
