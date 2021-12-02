@@ -69,7 +69,7 @@ void enableRawMode(){
     if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcgetattr");
 }
 
-char editorReadKey(){
+int editorReadKey(){
     int nread;
     char c;
     while ((nread = read(STDIN_FILENO, &c, 1)) != 1){
