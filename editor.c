@@ -304,11 +304,13 @@ void initEditor(){
 }
 int main() {
     enableRawMode();
+    initEditor();
 
     while(1){
         editorRefreshScreen();
         editorProcessKeypress();
     }
+    return 0;
 
     /*while(1){
        
@@ -326,5 +328,5 @@ int main() {
     }
     */
     //reads 1 byte from standard input into char c, as long it is not 'q'
-    return 0;
+    
 }
