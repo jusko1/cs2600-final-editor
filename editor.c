@@ -233,7 +233,7 @@ void editorRefreshScreen() {
 }
 /*** INPUT ***/
 
-void editorMoveCursor(char key){
+void editorMoveCursor(int key){
     switch(key) {
         case ARROW_LEFT:
             if (E.cx != 0){
