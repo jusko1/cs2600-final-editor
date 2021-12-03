@@ -505,7 +505,7 @@ void initEditor(){
     E.coloff = 0;
     E.numrows = 0;
     E.row = NULL
-    E.filename - NULL;
+    E.filename = NULL;
     E.statusmsg[0] = '\0';
     E.statusmsg_time = 0;
 
@@ -517,7 +517,7 @@ int main(int argc, char *argv[]) {
     enableRawMode();
     initEditor();
     if (argc >= 2){
-        editorOpen();
+        editorOpen(argv[1]);
     }
 
     editorSetStatusMessage("HELP: Ctrl-q = quit");
