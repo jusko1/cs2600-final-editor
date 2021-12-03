@@ -504,7 +504,7 @@ void initEditor(){
     E.rowoff = 0;
     E.coloff = 0;
     E.numrows = 0;
-    E.row = NULL
+    E.row = NULL;
     E.filename = NULL;
     E.statusmsg[0] = '\0';
     E.statusmsg_time = 0;
