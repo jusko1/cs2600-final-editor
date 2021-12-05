@@ -271,7 +271,7 @@ void editorRowInsertChar(erow *row, int at, int c){
     memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
     row->size++;
     row->chars[at] = c;
-    editorUdpateRow(row);
+    editorUpdateRow(row);
     E.dirty;
 }
 
@@ -323,7 +323,7 @@ void editorInsertNewLine(){
 }
 
 void editorDelChar() {
-    if (E.cy == e.numrows){
+    if (E.cy == E.numrows){
         return;
     }
     if (E.cx == 0 && E.cy == 0){
