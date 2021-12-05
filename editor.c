@@ -330,7 +330,7 @@ void editorDelChar() {
         return;
     }
 
-    erow *row = &E.row[e.cy];
+    erow *row = &E.row[E.cy];
     if (E.cx > 0){
         editorRowDelChar(row, E.cx - 1);
         E.cx--;
