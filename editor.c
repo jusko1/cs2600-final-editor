@@ -1,4 +1,4 @@
-//START HERE: compile chapter 5 in raspi, then move on to chapter 6
+//START HERE: section 7: step 153 "colorful numbers"
 /*** INCLUDES ***/
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
