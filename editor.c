@@ -1,4 +1,4 @@
-//START HERE: chapter5, step 122
+//START HERE: compile chapter 5 in raspi, then move on to chapter 6
 /*** INCLUDES ***/
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
@@ -65,6 +65,8 @@ struct editorConfig E;
 
 /*** PROTOTYPES ***/
 void editorSetStatusMessage(const char *fmt, ...);
+void editorRefreshScreen();
+char *editorPrompt(char *prompt);
 
 /*** TERMINAL ***/
 //allows for error handling
@@ -225,10 +227,14 @@ void editorUpdateRow(erow *row){
     row->rsize = idx;
 }
 
-void editorAppendRow(char *s, size_t len){
+void editorInsertRow(int at, char *s, size_t len){
+    if (at < 0 || at > E.numrows){
+        return;
+    }
     E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    memmove(&E.row[at + 1], &E.row[at], sizeof(erow) + (E.numrows - at));
 
-    int at = E.numrows;
+    
     E.row[at].size = len;
     E.row[at].chars = malloc(len + 1);
     memcpy(E.row[at].chars, s, len);
@@ -293,11 +299,27 @@ void editorInsertChar(int c){
     //if the cursor is on the tilde line at the end of the file, 
     //need to move to new line
     if (E.cy == E.numrows){
-        editorAppendRow("", 0);
+        editorInsertRow(E.numrows, "", 0);
     }
     editorRowInsertChar(&E.row[E.cy], E.cx, c);
     E.cx++;
 
+}
+
+void editorInsertNewLine(){
+    if (E.cx == 0){
+        editorInsertRow(E.cy, "", 0);
+    }
+    else {
+        erow *row = &E.row[E.cy];
+        editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+        row = &E.row[E.cx];
+        row->size = E.cx;
+        row->chars[row->size] = '\0';
+        editorUpdateRow(row);
+    }
+    E.cy++;
+    E.cx = 0;
 }
 
 void editorDelChar() {
@@ -356,7 +378,7 @@ void editorOpen(char *filename) {
         while (linelen> 0 && (line[linelen-1] == '\n' || line[linelen -1] == '\r')){
             linelen--;  
         }
-        editorAppendRow(line, linelen);
+        editorInsertRow(E.numrows, line, linelen);
     }
     free(line);
     fclose(fp);
@@ -365,7 +387,11 @@ void editorOpen(char *filename) {
 
 void editorSave() {
     if (E.filename == NULL){
-        return;
+        E.filename = editorPrompt("Save as: %s (ESC to cancel)");
+        if (E.filename == NULL){
+            editorSetStatusMessage("Save aborted");
+            return;
+        }
     }
     int len;
     char *buf = editorRowsToString(&len);
@@ -387,7 +413,7 @@ void editorSave() {
     editorSetStatusMessage("Can't save! I/) error: %s", strerror(errno));
    
     
-
+}
 /*** APPEND BUFFER ***/
 //creating a dynamic string type
 struct abuf {
@@ -539,6 +565,45 @@ void editorSetStatusMessage(const char *fmt, ...){
 }
 /*** INPUT ***/
 
+char *editorPrompt(char *prompt){
+    size_t bufsize = 128;
+    char *buf = malloc(bufsize);
+
+    size_t buflen = 0;
+    buf[0] = '\0';
+
+    while(1){
+        editorSetStatusMessage(prompt, buf);
+        editorRefreshScreen();
+
+        int c = editorReadKey();
+        if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE){
+            if (buflen != 0){
+                buf[--buflen] == '\0';
+            }
+        }
+        else if (c == '\x1b'){
+            editorSetStatusMessage("");
+            free(buf);
+            return NULL;
+        }
+        else if (c == '\r'){
+            if (buflen != 0){
+                editorSetStatusMessage("");
+                return buf;
+            }
+        }
+        else if(!iscntrl(c) && c < 128){
+            if(buflen == bufsize - 1){
+                bufsize *=2;
+                buf = realloc(buf, bufsize);
+            }
+            buf[buflen++] = c;
+            buf[buflen] = '\0';
+        }
+        
+    }
+}
 void editorMoveCursor(int key){
     erow *row  = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
 
@@ -587,6 +652,7 @@ void editorProcessKeypress() {
 
     switch (c) {
         case '\r':
+            editorInsertNewLine();
             break;
         
         //COMMAND: ctrl-q to quit
@@ -631,9 +697,14 @@ void editorProcessKeypress() {
                     E.cy - E.rowoff;
                 }
                 else if (c == PAGE_DOWN) {
+                    E.cy = E.rowoff +  E.screenrows -1;
                     if (E.cy > E.numrows){
                         E.cy = E.numrows;
                     }
+                }
+                int times = E.screenrows;
+                while (times--){
+                    editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
                 }
             }
             break;
