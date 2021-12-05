@@ -427,7 +427,9 @@ void abAppend(struct abuf *ab, const char *s, int len){
     //asks memory to give a block large enough to store the string
     char *new = realloc(ab->b, ab->len + len);
 
-    if (new == NULL) return;
+    if (new == NULL){
+        return;
+    } 
     memcpy(&new[ab->len], s, len);
     ab->b = new;
     ab->len += len;
@@ -595,7 +597,7 @@ char *editorPrompt(char *prompt){
         }
         else if(!iscntrl(c) && c < 128){
             if(buflen == bufsize - 1){
-                bufsize *=2;
+                bufsize *= 2;
                 buf = realloc(buf, bufsize);
             }
             buf[buflen++] = c;
