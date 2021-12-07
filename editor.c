@@ -45,7 +45,7 @@ enum editorHighlight {
     HL_KEYWORD2,
     HL_STRING,
     HL_NUMBER,
-    HL_MATCH;
+    HL_MATCH
 };
 
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
@@ -240,7 +240,7 @@ int getWindowSize(int *rows, int *cols){
 /*** SYNTAX HIGHLIGHTING ***/
 
 int is_separator(int c) {
-    return isspace(c) || c== '\0' || strchr(",.(+-/*=!%<>[];", c) !NULL:
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL:
 }
 
 void editorUpdateSyntax(erow *row){
@@ -271,8 +271,8 @@ void editorUpdateSyntax(erow *row){
         unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
 
         if (scs_len && !in_string && !in_comment){
-            if (!strcmp(&row->render[i], scs, scs_len)){
-                memset(&row->hl[i], HL_COMMENT, row->size - 1));
+            if (!strncmp(&row->render[i], scs, scs_len)){
+                memset(&row->hl[i], HL_COMMENT, row->rsize - i);
                 break;
             }
         }
@@ -344,7 +344,7 @@ void editorUpdateSyntax(erow *row){
                 }
 
                 if(!strncmp(&row->render[i], keywords[j], klen) && is_separator(row->render[i + klen])){
-                    memset(&row->hl[i], kw2, ? HL_KEYWORD2 : HL_KEYWORD 1, klen);
+                    memset(&row->hl[i], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
                     i += klen;
                     break;
                 }
@@ -510,7 +510,7 @@ void editorDelRow(int at){
     }
     editorFreeRow(&E.row[at]);
     memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
-    for (int j = at; j < E.numrow - 1; j++){
+    for (int j = at; j < E.numrows - 1; j++){
         E.row[j].idx--;
     }
     E.numrows--;
@@ -836,7 +836,7 @@ void editorDrawRows(struct abuf *ab){
             for (j = 0; j < len; j++){
                 if (iscntrl(c[j])){
                     char sym = (c[j] <= 26) ? '@' + c[j] : '?';
-                    abAppend(ab, "\x1b[7m", 4;)
+                    abAppend(ab, "\x1b[7m", 4);
                     abAppend(ab, &sym, 1);
                     abAppend(ab, "\x1b[m", 3);
                     if (current_color != -1){
@@ -847,7 +847,7 @@ void editorDrawRows(struct abuf *ab){
                 }
                 else if (hl[j] == HL_NORMAL){
                     if (current_color != -1){
-                        abAppend(ab, "\x1b39m", 5);
+                        abAppend(ab, "\x1b[39m", 5);
                         current_color = -1;
                     }
                     abAppend(ab, &c[j], 1);
@@ -864,7 +864,7 @@ void editorDrawRows(struct abuf *ab){
                     abAppend(ab, &c[j], 1);
                 }
             }
-            abAppend(ab, "\x1b39m", 5);
+            abAppend(ab, "\x1b[39m", 5);
         }
 
         abAppend(ab, "\x1b[K", 3);
