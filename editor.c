@@ -22,6 +22,7 @@
 #define KILO_VERSION "0.0.1"
 #define KILO_TAB_STOP 8
 #define KILO_QUIT_TIMES 3
+
 #define CTRL_KEY(k) ((k) & 0x1f)
 
 enum editorKey {
@@ -122,6 +123,9 @@ char *editorPrompt(char *prompt, void (*callback)(char *, int));
 /*** TERMINAL ***/
 //allows for error handling
 void die(const char *s) {
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
     perror(s);
     exit(1);
 }
@@ -189,7 +193,7 @@ int editorReadKey(){
                 }
             }
         }
-        else if(seq[0] == '0'){
+        else if(seq[0] == 'O'){
             switch (seq[1]){
                 case 'H': return HOME_KEY;
                 case 'F': return END_KEY;
@@ -208,7 +212,7 @@ int getCursorPosition(int *rows, int *cols){
 
     if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
 
-    while (i < sizeof(buf) -1){
+    while (i < sizeof(buf) - 1){
         if(read(STDIN_FILENO, &buf[i], 1) != 1) break;
         if(buf[i] == 'R') break;
         i++;
@@ -451,7 +455,7 @@ void editorUpdateRow(erow *row){
         }
     }
     free(row->render);
-    row->render = malloc(row->size + tabs*(KILO_TAB_STOP -1) + 1);
+    row->render = malloc(row->size + tabs*(KILO_TAB_STOP - 1) + 1);
 
     int idx = 0;
     for (j = 0; j < row->size; j++){
@@ -727,7 +731,7 @@ void editorFindCallback(char *query, int key){
             saved_hl_line = current;
             saved_hl = malloc(row->rsize);
             memcpy(saved_hl, row->hl, row->rsize);
-            memset(&row->hl[match - row ->render], HL_MATCH, strlen(query));
+            memset(&row->hl[match - row->render], HL_MATCH, strlen(query));
             break;
         }
     }
@@ -829,7 +833,7 @@ void editorDrawRows(struct abuf *ab){
             if (len > E.screencols) {
                 len = E.screencols;
             }
-            char *c = &E.row[filerow].render [E.coloff];
+            char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
             int current_color = -1;
             int j;
@@ -1047,7 +1051,7 @@ void editorProcessKeypress() {
             }
             
             //clearing the screen upon exit
-            write(STDOUT_FILENO, "\x1b[2j", 4);
+            write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
             break;
@@ -1082,10 +1086,10 @@ void editorProcessKeypress() {
         case PAGE_DOWN:
             {
                 if (c == PAGE_UP){
-                    E.cy - E.rowoff;
+                    E.cy = E.rowoff;
                 }
                 else if (c == PAGE_DOWN) {
-                    E.cy = E.rowoff +  E.screenrows - 1;
+                    E.cy = E.rowoff + E.screenrows - 1;
                     if (E.cy > E.numrows){
                         E.cy = E.numrows;
                     }
